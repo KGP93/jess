@@ -32,10 +32,10 @@ st.set_page_config(page_title="Jess – Your AI Assistant", layout="centered")
 st.title("👩‍💼 Jess – Your AI Personal Assistant")
 
 with st.form("jess_form"):
-    action = st.radio("What would you like me to do?", ["📅 Book Appointment", "✅ Add Task", "📧 Send Email"])
+    action = st.radio("What would you like me to do?", ["🗓 Book Appointment", "✅ Add Task", "📧 Send Email"])
     your_email = st.text_input("Your Email")
 
-    if action == "📅 Book Appointment":
+    if action == "🗓 Book Appointment":
         name = st.text_input("Your Name")
         title = st.text_input("Meeting Title")
         participant = st.text_input("Participant's Email")
@@ -61,7 +61,7 @@ with st.form("jess_form"):
 
 # ===== ACTION HANDLING =====
 if submitted:
-    if action == "📅 Book Appointment":
+    if action == "🗓 Book Appointment":
         start_dt = datetime.datetime.combine(date, time)
         delta = {"15 minutes": 15, "30 minutes": 30, "1 hour": 60}[duration]
         end_dt = start_dt + datetime.timedelta(minutes=delta)
@@ -80,15 +80,18 @@ if submitted:
             event = {
                 'summary': title,
                 'description': f"Scheduled by: {name}\n\n{description}",
-                'start': {'dateTime': start_dt.isoformat(), 'timeZone': 'America/New_York'},
-                'end': {'dateTime': end_dt.isoformat(), 'timeZone': 'America/New_York'},
+                'start': {'dateTime': start_dt.isoformat(), 'timeZone': 'America/Los_Angeles'},
+                'end': {'dateTime': end_dt.isoformat(), 'timeZone': 'America/Los_Angeles'},
                 'attendees': [{'email': participant}],
             }
 
-            event_result = calendar_service.events().insert(
-                calendarId='primary', body=event, sendUpdates='all'
-            ).execute()
-            st.success(f"📅 Appointment created: [View Event]({event_result.get('htmlLink')})")
+            try:
+                event_result = calendar_service.events().insert(
+                    calendarId='primary', body=event, sendUpdates='all'
+                ).execute()
+                st.success(f"🗓 Appointment created: [View Event]({event_result.get('htmlLink')})")
+            except Exception as e:
+                st.error(f"❌ Failed to create event. Error: {e}")
 
     elif action == "✅ Add Task":
         if all_day:
@@ -104,8 +107,8 @@ if submitted:
             task_event = {
                 'summary': task_title,
                 'description': task_description,
-                'start': {'dateTime': start_dt.isoformat(), 'timeZone': 'America/New_York'},
-                'end': {'dateTime': end_dt.isoformat(), 'timeZone': 'America/New_York'},
+                'start': {'dateTime': start_dt.isoformat(), 'timeZone': 'America/Los_Angeles'},
+                'end': {'dateTime': end_dt.isoformat(), 'timeZone': 'America/Los_Angeles'},
             }
 
         task_result = calendar_service.events().insert(calendarId='primary', body=task_event).execute()
