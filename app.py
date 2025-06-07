@@ -23,7 +23,7 @@ def authenticate_google():
 
     if not creds or not creds.valid:
         flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-        creds = flow.run_local_server(port=0)
+        creds = flow.run_console()  # ✅ SAFE for Streamlit Cloud
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
