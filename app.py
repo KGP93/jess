@@ -6,6 +6,7 @@ import base64
 from email.message import EmailMessage
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+calendar_service, gmail_service = authenticate_google()
 
 # ===== CONFIG =====
 SCOPES = [
