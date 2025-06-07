@@ -14,17 +14,21 @@ SCOPES = [
 ]
 
 # ===== AUTH =====
+import json
+from google.oauth2 import service_account
+
 @st.cache_resource
 def authenticate_google():
-    creds = service_account.Credentials.from_service_account_file(
-        "service_account.json",  # Make sure this file is uploaded in your repo
-        scopes=SCOPES
+    service_account_info = json.loads(st.secrets["SERVICE_ACCOUNT_JSON"])
+    creds = service_account.Credentials.from_service_account_info(
+        service_account_info, scopes=[
+            'https://www.googleapis.com/auth/calendar',
+            'https://www.googleapis.com/auth/gmail.send'
+        ]
     )
     calendar_service = build('calendar', 'v3', credentials=creds)
     gmail_service = build('gmail', 'v1', credentials=creds)
     return calendar_service, gmail_service
-
-calendar_service, gmail_service = authenticate_google()
 
 # ===== UI =====
 st.set_page_config(page_title="Jess – Your AI Assistant", layout="centered")
