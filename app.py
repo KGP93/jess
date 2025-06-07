@@ -25,18 +25,18 @@ def authenticate_google():
     gmail_service = build('gmail', 'v1', credentials=creds)
     return calendar_service, gmail_service
 
-# ✅ Now that the function is defined, we can safely call it
 calendar_service, gmail_service = authenticate_google()
 
 # ===== UI =====
 st.set_page_config(page_title="Jess – Your AI Assistant", layout="centered")
-st.title("👩‍💼 Jess – Your AI Personal Assistant")
+st.title("\U0001F469‍\U0001F4BC Jess – Your AI Personal Assistant")
 
 with st.form("jess_form"):
-    action = st.radio("What would you like me to do?", ["📅 Book Appointment", "✅ Add Task", "📧 Send Email"])
+    action = st.radio("What would you like me to do?", ["\U0001F4C5 Book Appointment", "✅ Add Task", "\U0001F4E7 Send Email"])
     your_email = st.text_input("Your Email")
 
-    if action == "📅 Book Appointment":
+    if action == "\U0001F4C5 Book Appointment":
+        name = st.text_input("Your Full Name")
         title = st.text_input("Meeting Title")
         participant = st.text_input("Participant's Email")
         date = st.date_input("Meeting Date")
@@ -52,7 +52,7 @@ with st.form("jess_form"):
         if not all_day:
             task_time = st.time_input("Task Time")
 
-    elif action == "📧 Send Email":
+    elif action == "\U0001F4E7 Send Email":
         recipient = st.text_input("Recipient's Email")
         subject = st.text_input("Subject")
         message = st.text_area("Email Body")
@@ -61,14 +61,14 @@ with st.form("jess_form"):
 
 # ===== ACTION HANDLING =====
 if submitted:
-    if action == "📅 Book Appointment":
+    if action == "\U0001F4C5 Book Appointment":
         start_dt = datetime.datetime.combine(date, time)
         delta = {"15 minutes": 15, "30 minutes": 30, "1 hour": 60}[duration]
         end_dt = start_dt + datetime.timedelta(minutes=delta)
 
         event = {
             'summary': title,
-            'description': description,
+            'description': f"Booked by: {name}\n\n{description}",
             'start': {'dateTime': start_dt.isoformat(), 'timeZone': 'America/New_York'},
             'end': {'dateTime': end_dt.isoformat(), 'timeZone': 'America/New_York'},
             'attendees': [{'email': participant}],
@@ -77,7 +77,7 @@ if submitted:
         event_result = calendar_service.events().insert(
             calendarId='primary', body=event, sendUpdates='all'
         ).execute()
-        st.success(f"📅 Appointment created: [View Event]({event_result.get('htmlLink')})")
+        st.success(f"\U0001F4C5 Appointment created: [View Event]({event_result.get('htmlLink')})")
 
     elif action == "✅ Add Task":
         if all_day:
@@ -100,7 +100,7 @@ if submitted:
         task_result = calendar_service.events().insert(calendarId='primary', body=task_event).execute()
         st.success(f"✅ Task added: [View Task]({task_result.get('htmlLink')})")
 
-    elif action == "📧 Send Email":
+    elif action == "\U0001F4E7 Send Email":
         email = EmailMessage()
         email.set_content(message)
         email['To'] = recipient
@@ -110,4 +110,4 @@ if submitted:
         encoded_msg = base64.urlsafe_b64encode(email.as_bytes()).decode()
         send_msg = {'raw': encoded_msg}
         sent = gmail_service.users().messages().send(userId="me", body=send_msg).execute()
-        st.success(f"📧 Email sent! Message ID: {sent['id']}")
+        st.success(f"\U0001F4E7 Email sent! Message ID: {sent['id']}")
