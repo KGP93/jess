@@ -6,7 +6,7 @@ import base64
 from email.message import EmailMessage
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-calendar_service, gmail_service = authenticate_google()
+import json
 
 # ===== CONFIG =====
 SCOPES = [
@@ -15,21 +15,18 @@ SCOPES = [
 ]
 
 # ===== AUTH =====
-import json
-from google.oauth2 import service_account
-
 @st.cache_resource
 def authenticate_google():
     service_account_info = json.loads(st.secrets["SERVICE_ACCOUNT_JSON"])
     creds = service_account.Credentials.from_service_account_info(
-        service_account_info, scopes=[
-            'https://www.googleapis.com/auth/calendar',
-            'https://www.googleapis.com/auth/gmail.send'
-        ]
+        service_account_info, scopes=SCOPES
     )
     calendar_service = build('calendar', 'v3', credentials=creds)
     gmail_service = build('gmail', 'v1', credentials=creds)
     return calendar_service, gmail_service
+
+# ✅ Now that the function is defined, we can safely call it
+calendar_service, gmail_service = authenticate_google()
 
 # ===== UI =====
 st.set_page_config(page_title="Jess – Your AI Assistant", layout="centered")
