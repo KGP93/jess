@@ -17,7 +17,7 @@ SCOPES = [
 # ===== AUTH =====
 @st.cache_resource
 def authenticate_google():
-    service_account_info = json.loads(st.secrets["SERVICE_ACCOUNT_JSON"])
+    service_account_info = st.secrets["SERVICE_ACCOUNT_JSON"]
     creds = service_account.Credentials.from_service_account_info(
         service_account_info, scopes=SCOPES
     )
