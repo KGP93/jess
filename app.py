@@ -20,7 +20,7 @@ def authenticate_google():
     service_account_info = json.loads(st.secrets["SERVICE_ACCOUNT_JSON"])
     creds = service_account.Credentials.from_service_account_info(
         service_account_info, scopes=SCOPES
-    )
+    ).with_subject("zack@kingdomgp.com")
     calendar_service = build('calendar', 'v3', credentials=creds)
     gmail_service = build('gmail', 'v1', credentials=creds)
     return calendar_service, gmail_service
