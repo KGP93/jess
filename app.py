@@ -4,8 +4,7 @@ import datetime
 import os
 import base64
 from email.message import EmailMessage
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 # ===== CONFIG =====
@@ -17,16 +16,10 @@ SCOPES = [
 # ===== AUTH =====
 @st.cache_resource
 def authenticate_google():
-    creds = None
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-
-    if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file('client_secret.json', SCOPES)
-        creds = flow.run_console()  # ✅ SAFE for Streamlit Cloud
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-
+    creds = service_account.Credentials.from_service_account_file(
+        "service_account.json",  # Make sure this file is uploaded in your repo
+        scopes=SCOPES
+    )
     calendar_service = build('calendar', 'v3', credentials=creds)
     gmail_service = build('gmail', 'v1', credentials=creds)
     return calendar_service, gmail_service
