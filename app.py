@@ -104,7 +104,7 @@ if submitted:
         email = EmailMessage()
         email.set_content(message)
         email['To'] = recipient
-        email['From'] = your_email
+        email['From'] = st.secrets["SERVICE_ACCOUNT_JSON"]["client_email"]
         email['Subject'] = subject
 
         encoded_msg = base64.urlsafe_b64encode(email.as_bytes()).decode()
